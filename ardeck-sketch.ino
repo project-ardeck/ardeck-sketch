@@ -1,4 +1,4 @@
-// ardeck-sketch.ino  This sketch makes the arduino a stream deck. By using button/potentiometer etc... you can control about your pc(example:Volume control,shortcut).
+// ardeck-sketch.ino  This sketch makes the arduino like a stream deck. By using button/potentiometer etc... you can control about your pc(example:Volume control,Keyboard shortcut).
 // Copyright (C) 2024 project-ardeck 
 
 // This program is free software; you can redistribute it and/or
