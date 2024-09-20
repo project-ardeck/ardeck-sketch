@@ -53,7 +53,7 @@ void setup() {
      pinMode(analog_stat[i][0],INPUT_PULLUP);
    }
 
-    Serial.begin(9600);
+    Serial.begin(BAUD);
 }
 
 void loop() {
