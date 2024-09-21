@@ -62,9 +62,9 @@ void loop() {
     button_stat[i][2] = digitalRead(button_stat[i][0]);
   }
 
-     for(int i=0;i<=VALUEOFANALOG;i++){
-     analog_stat[i][2] = analogRead(analog_stat[i][0]);
-   }
+  for(int i=0;i<=VALUEOFANALOG;i++){
+    analog_stat[i][2] = analogRead(analog_stat[i][0]);
+  }
 
 
 
@@ -92,8 +92,11 @@ int func_a(int stat_res,int num_pin){
   byte array_res[2]={0,0};
   array_res[1] = stat_res;         //Lower 8-bit input
   array_res[0] = stat_res >> 8;    //Higher 2 bits input
-  array_res[0] = 1 << 7 ;          // Assign 1 for AD determination
-  array_res[0] =(num_pin);
+  array_res[0] = array_res[0] | (B10000000) ;          // Assign 1 for AD determination
+  array_res[0] = array_res[0] | (num_pin << 2);
+  Serial.print(identifier[0]);
+  Serial.print(identifier[1]);
   Serial.write(array_res,2);     // Combine 8 bits and 2 bits and output
+  Serial.print(identifier[2]);
+  Serial.print(identifier[3]);
 }
-
