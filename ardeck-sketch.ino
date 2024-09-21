@@ -15,30 +15,30 @@
 // along with this program; if not, write to the Free Software
 // Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 
+#include "config.h"
 
+// #define VALUEOFDIGITAL 8                                    //Number of buttons -1 Don't change too much.
+// #define VALUEOFANALOG 6
+// int button_stat[VALUEOFDIGITAL + 1][4] = {
+//   { 2,1,0,0},						                                   //button ID (pin number), button use or not, button ON/OFF assignment, binary number to send
+//   { 3,1,0,0},                                              //Example.{2,1,0,0}->Use pin-2, button available, button OFF, button status preservation.
+//   { 4,1,0,0},.
+//   { 5,1,0,0},
+//   { 6,1,0,0},
+//   { 7,1,0,0},
+//   { 8,1,0,0},
+//   { 9,1,0,0},
+//   {10,1,0,0},
+// }; 
 
-#define VALUEOFDIGITAL 8                                    //Number of buttons -1 Don't change too much.
-#define VALUEOFANALOG 6
-int button_stat[VALUEOFDIGITAL + 1][4] = {
-  { 2,1,0,0},						                                   //button ID (pin number), button use or not, button ON/OFF assignment, binary number to send
-  { 3,1,0,0},                                              //Example.{2,1,0,0}->Use pin-2, button available, button OFF, button status preservation.
-  { 4,1,0,0},
-  { 5,1,0,0},
-  { 6,1,0,0},
-  { 7,1,0,0},
-  { 8,1,0,0},
-  { 9,1,0,0},
-  {10,1,0,0},
-}; 
-
-int analog_stat[VALUEOFANALOG][4]={          // pin number, pin use or not, pin value (voltage) assignment, binary number to send
-  {A0,1,0,0},
-  {A1,1,0,0},
-  {A2,1,0,0},
-  {A3,1,0,0},
-  {A4,1,0,0},
-  {A5,1,0,0},
-};
+// int analog_stat[VALUEOFANALOG][4]={          // pin number, pin use or not, pin value (voltage) assignment, binary number to send
+//   {A0,1,0,0},
+//   {A1,1,0,0},
+//   {A2,1,0,0},
+//   {A3,1,0,0},
+//   {A4,1,0,0},
+//   {A5,1,0,0},
+// };
 
 
 char identifier[4]={'A', 'D', 'E', 'C'};                     //Identifier. Sent at each Serial.write.
@@ -53,7 +53,7 @@ void setup() {
      pinMode(analog_stat[i][0],INPUT_PULLUP);
    }
 
-    Serial.begin(19200);
+    Serial.begin(BAUD);
 }
 
 void loop() {
