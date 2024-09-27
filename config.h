@@ -27,6 +27,7 @@ extern int analog_stat[VALUEOFANALOG][4]={
   {A5,1,0,0},
 };
 
+extern int switchmode = 0 ;      //normal open/colse (open:1, close:0)
 
 
 #endif
