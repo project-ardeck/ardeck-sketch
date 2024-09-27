@@ -70,7 +70,7 @@ void loop() {
 
   for(int i=0;i<=VALUEOFDIGITAL;i++){
     button_stat[i][3]=B00000010 + (i << 1);
-    if(button_stat[i][2] == 0){                              //Normal open/close switching (open:1, close:0)
+    if(button_stat[i][2] == switchmode){                              //Normal open/close switching (open:1, close:0)
       button_stat[i][3] = button_stat[i][3] + 1 ;
     }
     if(button_stat[i][1] == 1){ 
