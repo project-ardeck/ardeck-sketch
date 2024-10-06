@@ -3,7 +3,7 @@
 
 #define VALUEOFDIGITAL 8              //Number of buttons -1 
 #define VALUEOFANALOG 6               //Number of potentiometer -1 
-#define BAUD 192000
+#define BAUD 19200
 
 extern int button_stat[VALUEOFDIGITAL + 1][4] = {
   { 2,1,0,0},		 //button ID (pin number), button use or not, button ON/OFF assignment, binary number to send
