@@ -59,6 +59,8 @@ void loop() {
     func_a(analog_stat[i][2],i);
   }
 }
+
+//デジタル値をアプリに送信
 int func_d(byte array_d){             // Functionalize digital transmission
   Serial.print(identifier[0]);
   Serial.print(identifier[1]);
@@ -66,6 +68,8 @@ int func_d(byte array_d){             // Functionalize digital transmission
   Serial.print(identifier[2]);
   Serial.print(identifier[3]);
 }
+
+//アナログ値をアプリに送信
 int func_a(int stat_res,int num_pin){
   byte array_res[2]={0,0};
   array_res[1] = stat_res;         //Lower 8-bit input
