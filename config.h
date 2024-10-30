@@ -5,9 +5,10 @@
 #define VALUEOFANALOG 6               //Number of potentiometer -1 
 #define BAUD 19200
 
+//ボタンの設定を格納
 extern int button_stat[VALUEOFDIGITAL + 1][4] = {
-  { 2,1,0,0},		 //button ID (pin number), button use or not, button ON/OFF assignment, binary number to send
-  { 3,1,0,0},        //Example.{2,1,0,0}->Use pin-2, button available, button OFF, button status preservation.
+  { 2,1,0,0},		 
+  { 3,1,0,0},        
   { 4,1,0,0},
   { 5,1,0,0},
   { 6,1,0,0},
@@ -17,9 +18,9 @@ extern int button_stat[VALUEOFDIGITAL + 1][4] = {
   {10,1,0,0},
 }; 
 
-
+//VRの設定を格納(ピン番号、ピンの使用（1:y 0:n）電圧格納、送信する二進数を格納)
 extern int analog_stat[VALUEOFANALOG][4]={  
-  {A1,1,0,0},         // pin number, pin use or not, pin value (voltage) assignment, binary number to send
+  {A1,1,0,0},         
   {A0,1,0,0},
   {A2,1,0,0},
   {A3,1,0,0},
@@ -27,7 +28,7 @@ extern int analog_stat[VALUEOFANALOG][4]={
   {A5,1,0,0},
 };
 
-extern int switchmode = 0 ;      //normal open/colse (open:1, close:0)
+extern int switchmode = 0 ;      //ノーマリーオープン　(オープン:1, クローズ:0)
 
 
 #endif
