@@ -17,68 +17,81 @@
 
 #include "config.h"
 
+const char IDENTIFIER[4] = {'A', 'D', 'E', 'C'};
 
-
-char identifier[4]={'A', 'D', 'E', 'C'};                     //Identifier. Sent at each Serial.write.
-
-
-void setup() {
-  for(int i=0;i<=VALUEOFDIGITAL;i++){                         //PinMode switching of //digital pins
-    pinMode(button_stat[i][0], INPUT_PULLUP);               
+void setup()
+{
+  // Init of digital pin
+  for (int i = 0; i < NUMBER_OF_D_SWITCH; i++)
+  {
+    pinMode(d_switch_pin[i][0], INPUT_PULLUP);
   }
 
-   for(int i=0;i<=VALUEOFANALOG;i++){                            // pinMode switching of analog pins
-     pinMode(analog_stat[i][0],INPUT_PULLUP);
-   }
-
-    Serial.begin(BAUD);
+  Serial.begin(BAUD_RATE);
 }
 
-void loop() {
-
-  for(int i=0;i<=VALUEOFDIGITAL;i++){
-    button_stat[i][2] = digitalRead(button_stat[i][0]);
-  }
-
-  for(int i=0;i<=VALUEOFANALOG;i++){
-    analog_stat[i][2] = analogRead(analog_stat[i][0]);
-  }
-
-
-
-  for(int i=0;i<=VALUEOFDIGITAL;i++){
-    button_stat[i][3]=B00000010 + (i << 1);
-    if(button_stat[i][2] == switchmode){                              //Normal open/close switching.
-      button_stat[i][3] = button_stat[i][3] + 1 ;
+void loop()
+{
+  for (int i = 0; i < NUMBER_OF_D_SWITCH; i++)
+  {
+    int state = 0;
+    state = digitalRead(d_switch_pin[i][0]);
+    if (d_switch_pin[i][1] == 0)
+    {
+      state ^= 1;
     }
-    if(button_stat[i][1] == 1){ 
-      func_d(button_stat[i][3]);
-    }
+    send_d(d_switch_pin[i][0], state);
+
+    delay(SEND_INTERVAL);
   }
-  for(int i=0;i<VALUEOFANALOG;i++){
-    func_a(analog_stat[i][2],i);
+
+  for (int i = 0; i < NUMBER_OF_A_SWITCH; i++)
+  {
+    int state = 0;
+    state = analogRead(a_switch_pin[i]);
+    send_a(a_switch_pin[i], state);
+    
+    delay(SEND_INTERVAL);
   }
 }
 
-//デジタル値をアプリに送信
-int func_d(byte array_d){             // Functionalize digital transmission
-  Serial.print(identifier[0]);
-  Serial.print(identifier[1]);
-  Serial.write(array_d);
-  Serial.print(identifier[2]);
-  Serial.print(identifier[3]);
+int send_d(int pin, int state)
+{
+  if (pin > 64)
+  {
+    return -1;
+  }
+
+  byte body = 0;
+  body =
+    ((pin & 0b00111111) << 1) |
+    (state & 1);
+
+  Serial.write(IDENTIFIER, 2);
+  Serial.write(body);
+  Serial.write(&IDENTIFIER[2], 2);
+
+  return 0;
 }
 
-//アナログ値をアプリに送信
-int func_a(int stat_res,int num_pin){
-  byte array_res[2]={0,0};
-  array_res[1] = stat_res;         //Lower 8-bit input
-  array_res[0] = stat_res >> 8;    //Higher 2 bits input
-  array_res[0] = array_res[0] | (B10000000) ;          // Assign 1 for AD determination
-  array_res[0] = array_res[0] | (num_pin << 2);
-  Serial.print(identifier[0]);
-  Serial.print(identifier[1]);
-  Serial.write(array_res,2);     // Combine 8 bits and 2 bits and output
-  Serial.print(identifier[2]);
-  Serial.print(identifier[3]);
+int send_a(int pin, int state)
+{
+  if (pin > 32)
+  {
+    return -1;
+  }
+
+  byte body[2] = {0, 0};
+  body[0] =
+    (1 << 7) |
+    ((pin & 0b00011111) << 2) |
+    (state & 0b1100000000) >> 8;
+
+  body[1] = state & 0xFF;
+
+  Serial.write(IDENTIFIER, 2);
+  Serial.write(body, 2);
+  Serial.write(&IDENTIFIER[2], 2);
+
+  return 0;
 }
