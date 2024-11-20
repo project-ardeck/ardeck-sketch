@@ -1,34 +1,21 @@
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef ARDECK_CONFIG_H // Do not change
+#define ARDECK_CONFIG_H // Do not change
 
-#define VALUEOFDIGITAL 8              //Number of buttons -1 
-#define VALUEOFANALOG 6               //Number of potentiometer -1 
-#define BAUD 19200
+#define BAUD_RATE 9600 // Serial port baud rate (Recommend: 9600 or 19200)
+#define SEND_INTERVAL 1 // Send interval (If you don't want it, set it to 0.)
 
-//ボタンの設定を格納
-extern int button_stat[VALUEOFDIGITAL + 1][4] = {
-  { 2,1,0,0},		 
-  { 3,1,0,0},        
-  { 4,1,0,0},
-  { 5,1,0,0},
-  { 6,1,0,0},
-  { 7,1,0,0},
-  { 8,1,0,0},
-  { 9,1,0,0},
-  {10,1,0,0},
-}; 
+extern const int d_switch_pin[][2] = // Specify digital pins to use and default values. {pin_number, default_value}
+  {
+    {2, 0},
+    {3, 0}
+  };
 
-//VRの設定を格納(ピン番号、ピンの使用（1:y 0:n）電圧格納、送信する二進数を格納)
-extern int analog_stat[VALUEOFANALOG][4]={  
-  {A1,1,0,0},         
-  {A0,1,0,0},
-  {A2,1,0,0},
-  {A3,1,0,0},
-  {A4,1,0,0},
-  {A5,1,0,0},
+extern const int a_switch_pin[] = // Specify analog ping.
+{ 
+  A0
 };
 
-extern int switchmode = 0 ;      //ノーマリーオープン　(オープン:1, クローズ:0)
+#define NUMBER_OF_D_SWITCH sizeof(d_switch_pin) / sizeof(d_switch_pin[0]) // Do not change
+#define NUMBER_OF_A_SWITCH sizeof(a_switch_pin) / sizeof(a_switch_pin[0]) // Do not change
 
-
-#endif
+#endif // Do not change
