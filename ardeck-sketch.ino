@@ -48,7 +48,7 @@ void loop()
   for (int i = 0; i < NUMBER_OF_A_SWITCH; i++)
   {
     int state = 0;
-    state = analogRead(a_switch_pin[i]);
+    state = analogRead(1023 - a_switch_pin[i]);    //if you delete "1023", analog input will invert
     send_a(a_switch_pin[i], state);
     
     delay(SEND_INTERVAL);
