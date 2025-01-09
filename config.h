@@ -11,7 +11,7 @@ extern const int d_switch_pin[][2] = // Specify digital pins to use and default 
   };
 
 extern const int a_switch_pin[] = // Specify analog ping.
-{ 
+{
   A0
 };
 
