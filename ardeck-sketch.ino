@@ -1,5 +1,5 @@
 // ardeck-sketch.ino  This sketch makes the arduino like a stream deck. By using button/potentiometer etc... you can control about your pc(example:Volume control,Keyboard shortcut).
-// Copyright (C) 2024 project-ardeck 
+// Copyright (C) 2024 project-ardeck
 
 // This program is free software; you can redistribute it and/or
 // modify it under the terms of the GNU General Public License
@@ -18,6 +18,21 @@
 #include "config.h"
 
 const char IDENTIFIER[4] = {'A', 'D', 'E', 'C'};
+
+void cobs_encode(byte *input, int length, byte *output)
+{
+  output[1] = input[0];
+}
+
+byte check_sum(byte *data, int length)
+{
+  byte sum = 0;
+  for (int i = 0; i < length; i++)
+  {
+    sum += data[i];
+  }
+  return sum;
+}
 
 void setup()
 {
@@ -48,9 +63,9 @@ void loop()
   for (int i = 0; i < NUMBER_OF_A_SWITCH; i++)
   {
     int state = 0;
-    state = 1023 - analogRead(a_switch_pin[i]);    //if you delete "1023", analog input will invert
+    state = 1023 - analogRead(a_switch_pin[i]); // if you delete "1023", analog input will invert
     send_a(a_switch_pin[i], state);
-    
+
     delay(SEND_INTERVAL);
   }
 }
@@ -62,14 +77,22 @@ int send_d(int pin, int state)
     return -1;
   }
 
-  byte body = 0;
-  body =
-    ((pin & 0b00111111) << 1) |
-    (state & 1);
+  byte body[4] = {0x03, 0xFF, 0xFF, 0}; // 0:COBS_HEAD, 1:DATA, 2:CHECKSUM, 3:COBS_END
+  body[1] =
+      (((pin & 0b00111111) << 1) |
+       (state & 1));
+  body[2] = check_sum(&body[1], 1);
 
-  Serial.write(IDENTIFIER, 2);
-  Serial.write(body);
-  Serial.write(&IDENTIFIER[2], 2);
+  // COBS encode
+  if (body[1] == 0 && body[2] == 0)
+  {
+    body[0] = 0x01;
+    body[1] = 0x01;
+    body[2] = 0x01;
+  }
+  // DATAが1バイトであるので、どちらかのみが0になるという状態はありえないため、記述を省略
+
+  Serial.write(body, 4);
 
   return 0;
 }
@@ -81,16 +104,18 @@ int send_a(int pin, int state)
     return -1;
   }
 
-  byte body[2] = {0, 0};
+  byte body[3] = {0, 0, 0};
   body[0] =
-    (1 << 7) |
-    ((pin & 0b00011111) << 2) |
-    (state & 0b1100000000) >> 8;
+      (1 << 7) |
+      ((pin & 0b00011111) << 2) |
+      (state & 0b1100000000) >> 8;
 
-  body[1] = state & 0xFF;
+  body[1] = (byte)state;
+
+  body[2] = check_sum(body, 2);
 
   Serial.write(IDENTIFIER, 2);
-  Serial.write(body, 2);
+  Serial.write(body, 3);
   Serial.write(&IDENTIFIER[2], 2);
 
   return 0;
