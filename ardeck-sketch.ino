@@ -94,6 +94,13 @@ int send_d(int pin, int state)
 
   Serial.write(body, 4);
 
+  // for (int i = 0; i < 4; i++)
+  // {
+  //   Serial.print(body[i], HEX);
+  //   Serial.print(" ");
+  // }
+  // Serial.println();
+
   return 0;
 }
 
@@ -116,7 +123,7 @@ int send_a(int pin, int state)
 
   // COBS encode
   int prev_zero_index = 4;
-  for (int i = 4; i >= 0; i--)
+  for (int i = 3; i >= 0; i--)
   {
     if (body[i] == 0)
     {
@@ -125,9 +132,14 @@ int send_a(int pin, int state)
     }
   }
 
-  // TODO: その他の場合
+  Serial.write(body, 5);
 
-  Serial.write(body, 3);
+  // for (int i = 0; i < 5; i++)
+  // {
+  //   Serial.print(body[i], HEX);
+  //   Serial.print(" ");
+  // }
+  // Serial.println();
 
   return 0;
 }
