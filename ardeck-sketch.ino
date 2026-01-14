@@ -17,23 +17,6 @@
 
 #include "config.h"
 
-const char IDENTIFIER[4] = {'A', 'D', 'E', 'C'};
-
-void cobs_encode(byte *input, int length, byte *output)
-{
-  output[1] = input[0];
-}
-
-byte check_sum(byte *data, int length)
-{
-  byte sum = 0;
-  for (int i = 0; i < length; i++)
-  {
-    sum += data[i];
-  }
-  return sum;
-}
-
 void setup()
 {
   // Init of digital pin
