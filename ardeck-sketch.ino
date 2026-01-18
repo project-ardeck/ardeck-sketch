@@ -118,9 +118,18 @@ void loop()
     {
       if (prev_d_state->pin == pin)
       {
+        Serial.print("info: ");
+        Serial.print(pin);
+        Serial.print(" ");
+        Serial.print(prev_d_state->pin);
+        Serial.print(" ");
+        Serial.print(state);
+        Serial.print(" ");
+        Serial.print(prev_d_state->state);
+        Serial.println();
         if (prev_d_state->state != state)
         {
-          send_d(pin, state);
+          // send_d(pin, state);
         }
         prev_d_state->state = state;
       }
@@ -142,7 +151,7 @@ void loop()
       {
         if (prev_a_state->state != state)
         {
-          send_a(pin, state);
+          // send_a(pin, state);
         }
         prev_a_state->state = state;
       }
@@ -159,7 +168,7 @@ int send_d(int pin, int state)
     return -1;
   }
 
-  byte body[2] = {0xFF, 0xFF};
+  byte body[2] = {0, 0};
   body[0] =
       (((pin & 0b00111111) << 1) |
        (state & 1));
@@ -181,7 +190,7 @@ int send_a(int pin, int state)
     return -1;
   }
 
-  byte body[3] = {0xFF, 0xFF, 0xFF}; // 0:COBS_HEAD, 1:DATA, 2:DATA, 3:CHECKSUM, 4:COBS_END
+  byte body[3] = {0, 0, 0};
   body[0] =
       (1 << 7) |
       ((pin & 0b00011111) << 2) |
