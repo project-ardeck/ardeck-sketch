@@ -166,16 +166,10 @@ int send_d(int pin, int state)
 
   body[1] = check_sum(&body[2], 1);
 
-  // COBS encode
-  if (body[1] == 0 && body[2] == 0)
-  {
-    body[0] = 0x01;
-    body[1] = 0x01;
-    body[2] = 0x01;
-  }
-  // DATAが1バイトであるので、どちらかのみが0になるという状態はありえないため、記述を省略
+  byte cobsed[4];
+  cobs(body, 2, cobsed);
 
-  Serial.write(body, 4);
+  Serial.write(cobsed, 4);
 
   return 0;
 }
@@ -187,28 +181,20 @@ int send_a(int pin, int state)
     return -1;
   }
 
-  byte body[5] = {0x04, 0xFF, 0xFF, 0xFF, 0}; // 0:COBS_HEAD, 1:DATA, 2:DATA, 3:CHECKSUM, 4:COBS_END
-  body[1] =
+  byte body[3] = {0xFF, 0xFF, 0xFF}; // 0:COBS_HEAD, 1:DATA, 2:DATA, 3:CHECKSUM, 4:COBS_END
+  body[0] =
       (1 << 7) |
       ((pin & 0b00011111) << 2) |
       (state & 0b1100000000) >> 8;
 
-  body[2] = (byte)state;
+  body[1] = (byte)state;
 
-  body[3] = check_sum(&body[1], 2);
+  body[2] = check_sum(&body[1], 2);
 
-  // COBS encode
-  int prev_zero_index = 4;
-  for (int i = 3; i >= 0; i--)
-  {
-    if (body[i] == 0)
-    {
-      body[i] = prev_zero_index - i + 1;
-      prev_zero_index = i;
-    }
-  }
-
-  Serial.write(body, 5);
+  byte cobsed[5];
+  cobs(body, 3, cobsed);
+  
+  Serial.write(cobsed, 5);
 
   return 0;
 }
