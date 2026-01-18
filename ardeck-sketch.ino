@@ -19,7 +19,7 @@
 
 /// @brief ボディーデータの開始インデックスと長さを渡すと、その合計値を1バイトで返します。
 /// @param data 配列のポインタ
-/// @param length 長さ
+/// @param length 配列の長さ
 /// @return １バイトの合計値
 byte check_sum(byte *data, int length)
 {
@@ -31,8 +31,48 @@ byte check_sum(byte *data, int length)
   return sum;
 }
 
+/// @brief byteの配列データをcobsエンコードします。
+/// @param data 配列のポインタ
+/// @param length 配列の長さ
+/// @param res cobsエンコードされた配列のポインタ 長さは`data` + 2 になります
+void cobs(byte *data, int length, byte *res)
+{
+  int res_len = length + 2;
+  memset(res, 0, sizeof(res_len));
+
+  for (int i = 0; i < 4; i++)
+  {
+    printf("%d ", data[i]);
+  }
+  printf("\n");
+
+  for (int i = 0; i < length; i++)
+  {
+    res[i + 1] = data[i];
+  }
+
+  for (int i = 0; i < 6; i++)
+  {
+    printf("%d ", res[i]);
+  }
+  printf("\n");
+
+  // 一番新しい、今のところ見つけた0の場所
+  int prev_zero_index = 0;
+
+  for (int i = 0; i < res_len; i++)
+  {
+    if (res[i] == 0)
+    {
+      res[prev_zero_index] = i - prev_zero_index;
+      prev_zero_index = i;
+    }
+  }
+}
+
 /// @brief スイッチの状態を保持する構造体
-struct SwitchState {
+struct SwitchState
+{
   /// @brief ピン番号
   int pin;
   /// @brief スイッチの状態を表す数値
@@ -48,14 +88,14 @@ void setup()
   // Init of digital pin
   for (int i = 0; i < NUMBER_OF_D_SWITCH; i++)
   {
-    prev_d_state[i] = SwitchState {d_switch_pin[i][0], 0};
+    prev_d_state[i] = SwitchState{d_switch_pin[i][0], 0};
     pinMode(d_switch_pin[i][0], INPUT_PULLUP);
   }
 
   // Init of analog pin
   for (int i = 0; i < NUMBER_OF_A_SWITCH; i++)
   {
-    prev_a_state[i] = SwitchState {a_switch_pin[i], 0};
+    prev_a_state[i] = SwitchState{a_switch_pin[i], 0};
   }
 
   Serial.begin(BAUD_RATE);
@@ -119,10 +159,12 @@ int send_d(int pin, int state)
     return -1;
   }
 
-  byte body[3] = {0x02, 0xFF, 0x00}; // 0:COBS_HEAD, 1:DATA, 2:COBS_END
-  body[1] =
+  byte body[2] = {0xFF, 0xFF};
+  body[0] =
       (((pin & 0b00111111) << 1) |
        (state & 1));
+
+  body[1] = check_sum(&body[2], 1);
 
   // COBS encode
   if (body[1] == 0 && body[2] == 0)
