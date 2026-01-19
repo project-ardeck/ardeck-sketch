@@ -2,7 +2,7 @@
 
 Ardeckの通信は、最小限のデータ送信ですむように、数バイトに様々なデータをまとめています。
 
-また、実際に送信されるデータは[COBS](https://en.wikipedia.org/wiki/Consistent_Overhead_Byte_Stuffing)に従ってエンコードされています。
+また、実際に送信されるデータは1バイトのチェックサムを付与したうえで[COBS](https://en.wikipedia.org/wiki/Consistent_Overhead_Byte_Stuffing)に従ってエンコードされています。
 
 ## デジタルスイッチ
 

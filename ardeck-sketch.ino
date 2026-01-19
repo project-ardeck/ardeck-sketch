@@ -38,7 +38,6 @@ byte check_sum(byte *data, int length)
 void cobs(byte *data, int length, byte *res)
 {
   int res_len = length + 2;
-  memset(res, 0, sizeof(res_len));
 
   for (int i = 0; i < 4; i++)
   {
@@ -70,32 +69,26 @@ void cobs(byte *data, int length, byte *res)
   }
 }
 
-/// @brief スイッチの状態を保持する構造体
-struct SwitchState
-{
-  /// @brief ピン番号
-  int pin;
-  /// @brief スイッチの状態を表す数値
-  int state;
-};
-
 // 1ループ前のデジタルスイッチの状態
-SwitchState prev_d_state[NUMBER_OF_D_SWITCH];
-SwitchState prev_a_state[NUMBER_OF_A_SWITCH];
+int prev_d_state[NUMBER_OF_D_SWITCH][2];
+int prev_a_state[NUMBER_OF_A_SWITCH][2];
 
 void setup()
 {
   // Init of digital pin
   for (int i = 0; i < NUMBER_OF_D_SWITCH; i++)
   {
-    prev_d_state[i] = SwitchState{d_switch_pin[i][0], 0};
+    prev_d_state[i][0] = d_switch_pin[i][0]; // [0] ピン番号
+    prev_d_state[i][1] = 0;                  // [1] スイッチの状態
+
     pinMode(d_switch_pin[i][0], INPUT_PULLUP);
   }
 
   // Init of analog pin
   for (int i = 0; i < NUMBER_OF_A_SWITCH; i++)
   {
-    prev_a_state[i] = SwitchState{a_switch_pin[i], 0};
+    prev_a_state[i][0] = a_switch_pin[i]; // [0] ピン番号
+    prev_a_state[i][1] = 0;               // [1] スイッチの状態
   }
 
   Serial.begin(BAUD_RATE);
@@ -103,37 +96,26 @@ void setup()
 
 void loop()
 {
+  // 各スイッチのステータスを取得して処理する
   for (int i = 0; i < NUMBER_OF_D_SWITCH; i++)
   {
-    int pin = d_switch_pin[i][0];
-    int state = 0;
-    state = digitalRead(pin);
+    int pin = d_switch_pin[i][0]; // 対象のピン番号
+    int state = digitalRead(pin); // 対象のステータス
+
+    // デフォルト値のユーザー設定に従って変換する
     if (d_switch_pin[i][1] == 0)
     {
       state ^= 1;
     }
 
-    // 前回の情報と比較して、スイッチ状態が変わっていれば送信する。
-    for (int j = 0; j < NUMBER_OF_D_SWITCH; i++)
+    // 前回の情報と比較して、ステータスが変わっていれば送信する。
+    // if (prev_d_state[i][1] != state)
     {
-      if (prev_d_state->pin == pin)
-      {
-        Serial.print("info: ");
-        Serial.print(pin);
-        Serial.print(" ");
-        Serial.print(prev_d_state->pin);
-        Serial.print(" ");
-        Serial.print(state);
-        Serial.print(" ");
-        Serial.print(prev_d_state->state);
-        Serial.println();
-        if (prev_d_state->state != state)
-        {
-          // send_d(pin, state);
-        }
-        prev_d_state->state = state;
-      }
+      send_d(pin, state);
     }
+
+    // ステータスを保存する
+    prev_d_state[i][1] = state;
 
     delay(SEND_INTERVAL);
   }
@@ -144,18 +126,14 @@ void loop()
     int state = 0;
     state = 1023 - analogRead(a_switch_pin[i]); // if you delete "1023", analog input will invert
 
-    // 前回の情報と比較して、スイッチ状態が変わっていれば送信する。
-    for (int j = 0; j < NUMBER_OF_A_SWITCH; i++)
+    // 前回の情報と比較して、ステータスが変わっていれば送信する。
+    // if (prev_a_state[i][1] != state)
     {
-      if (prev_a_state->pin == pin)
-      {
-        if (prev_a_state->state != state)
-        {
-          // send_a(pin, state);
-        }
-        prev_a_state->state = state;
-      }
+      send_a(pin, state);
     }
+
+    // ステータスを保存する
+    prev_a_state[i][1] = state;
 
     delay(SEND_INTERVAL);
   }
@@ -175,7 +153,7 @@ int send_d(int pin, int state)
 
   body[1] = check_sum(&body[2], 1);
 
-  byte cobsed[4];
+  byte cobsed[4] = {0, 0, 0, 0};
   cobs(body, 2, cobsed);
 
   Serial.write(cobsed, 4);
@@ -200,9 +178,9 @@ int send_a(int pin, int state)
 
   body[2] = check_sum(&body[1], 2);
 
-  byte cobsed[5];
+  byte cobsed[5] = {0, 0, 0, 0, 0};
   cobs(body, 3, cobsed);
-  
+
   Serial.write(cobsed, 5);
 
   return 0;
