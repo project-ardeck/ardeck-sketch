@@ -12,7 +12,7 @@ extern const int d_switch_pin[][2] = // Specify digital pins to use and default 
 
 extern const int a_switch_pin[] = // Specify analog ping.
 {
-  A0
+  // A0
 };
 
 #define NUMBER_OF_D_SWITCH sizeof(d_switch_pin) / sizeof(d_switch_pin[0]) // Do not change
