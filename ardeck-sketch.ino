@@ -151,7 +151,7 @@ int send_d(int pin, int state)
       (((pin & 0b00111111) << 1) |
        (state & 1));
 
-  body[1] = check_sum(&body[2], 1);
+  body[1] = check_sum(&body[0], 1);
 
   byte cobsed[4] = {0, 0, 0, 0};
   cobs(body, 2, cobsed);
@@ -176,7 +176,7 @@ int send_a(int pin, int state)
 
   body[1] = (byte)state;
 
-  body[2] = check_sum(&body[1], 2);
+  body[2] = check_sum(&body[0], 2);
 
   byte cobsed[5] = {0, 0, 0, 0, 0};
   cobs(body, 3, cobsed);
