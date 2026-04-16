@@ -96,6 +96,20 @@ void setup()
 
 void loop()
 {
+  bool is_send_all = false;
+
+  // コマンドを受信したら処理する
+  if (Serial.available() > 0)
+  {
+    int read = Serial.read();
+
+    if (read == 0xFF)
+    {
+      // 全送信コマンド
+      is_send_all = true;
+    }
+  }
+
   // 各スイッチのステータスを取得して処理する
   for (int i = 0; i < NUMBER_OF_D_SWITCH; i++)
   {
@@ -110,6 +124,7 @@ void loop()
 
     // 前回の情報と比較して、ステータスが変わっていれば送信する。
     // if (prev_d_state[i][1] != state)
+    if ((prev_d_state[i][1] != state) || is_send_all)
     {
       send_d(pin, state);
     }
@@ -128,6 +143,7 @@ void loop()
 
     // 前回の情報と比較して、ステータスが変わっていれば送信する。
     // if (prev_a_state[i][1] != state)
+    if ((prev_a_state[i][1] != state) || is_send_all)
     {
       send_a(pin, state);
     }
