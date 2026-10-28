@@ -17,6 +17,11 @@
 
 #include "config.h"
 
+static char CMD_REQUEST_ALL_SWITCH_INFO = 0x01;
+static char CMD_REQUEST_START_CONTINUOUS_MODE = 0x11;
+static char CMD_REQUEST_START_TRIGGERED_CONTINUOUS_MODE = 0x12;
+static char CMD_REQUEST_STOP_CONTINUOUS_MODE = 0x1F;
+
 /// @brief ボディーデータの開始インデックスと長さを渡すと、その合計値を1バイトで返します。
 /// @param data 配列のポインタ
 /// @param length 配列の長さ
@@ -73,6 +78,9 @@ void cobs(byte *data, int length, byte *res)
 int prev_d_state[NUMBER_OF_D_SWITCH][2];
 int prev_a_state[NUMBER_OF_A_SWITCH][2];
 
+bool is_continuous_mode;
+bool is_triggered_mode;
+
 void setup()
 {
   // Init of digital pin
@@ -92,6 +100,9 @@ void setup()
   }
 
   Serial.begin(BAUD_RATE);
+
+  is_continuous_mode = false;
+  is_triggered_mode = false;
 }
 
 void loop()
@@ -103,10 +114,16 @@ void loop()
   {
     int read = Serial.read();
 
-    if (read == 0xFF)
+    if (read == CMD_REQUEST_ALL_SWITCH_INFO)
     {
-      // 全送信コマンド
       is_send_all = true;
+    } else if (read == CMD_REQUEST_START_CONTINUOUS_MODE) {
+      is_continuous_mode = true;
+    } else if (read == CMD_REQUEST_START_TRIGGERED_CONTINUOUS_MODE) {
+      is_triggered_mode = true;
+    } else if (read == CMD_REQUEST_STOP_CONTINUOUS_MODE) {
+      is_continuous_mode = false;
+      is_triggered_mode = false;
     }
   }
 
@@ -123,8 +140,7 @@ void loop()
     }
 
     // 前回の情報と比較して、ステータスが変わっていれば送信する。
-    // if (prev_d_state[i][1] != state)
-    if ((prev_d_state[i][1] != state) || is_send_all)
+    if (is_send_all || is_continuous_mode || (is_triggered_mode && prev_d_state[i][1] != state))
     {
       send_d(pin, state);
     }
@@ -143,9 +159,10 @@ void loop()
 
     // 前回の情報と比較して、ステータスが変わっていれば送信する。
     // if (prev_a_state[i][1] != state)
-    if ((prev_a_state[i][1] != state) || is_send_all)
+    // if ((prev_a_state[i][1] != state) || is_send_all)
+    if (is_send_all || is_continuous_mode || (is_triggered_mode && prev_a_state[i][1] != state))
     {
-      send_a(pin, state);
+      send_d(pin, state);
     }
 
     // ステータスを保存する
