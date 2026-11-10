@@ -6,6 +6,22 @@ Ardeckの通信は、最小限のデータ送信ですむように、数バイ�
 
 また、実際に送信されるデータは1バイトのチェックサムを付与したうえで[COBS](https://en.wikipedia.org/wiki/Consistent_Overhead_Byte_Stuffing)に従ってエンコードされています。
 
+
+```mermaid
+---
+title: Overview
+config:
+  packet:
+    bitWidth: 86
+    bitsPerRow: 8
+---
+packet
++1: "COBS data"
++4: "Payload"
++2: "Check sum"
++1: "COBS data"
+```
+
 ### デジタルスイッチ
 
 デジタルスイッチのペイロードは `1バイト` です。
